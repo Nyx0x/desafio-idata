@@ -39,14 +39,16 @@ Qual seria o comando para trazer o seguinte resultado?
 Resposta:
 Com base nas tabelas `DISCIPLINA` e `DOCENTE`, o comando para obter a projeção unificada com o nome do professor por disciplina é:
 
-''' SQL
+```sql
 SELECT 
     d.Cod, 
     d.Componente, 
     d.Unid, 
     doc.Professor
 FROM DISCIPLINA d
-INNER JOIN DOCENTE doc ON d.Cod = doc.Cod;
+INNER JOIN DOCENTE doc 
+        ON d.Cod = doc.Cod;
+```
 
 
 ### Questão 2 - Consulta Relacional com Confirmação de Embarque
@@ -54,27 +56,26 @@ INNER JOIN DOCENTE doc ON d.Cod = doc.Cod;
 Através do dump fornecido para você, faça um consulta que retorne todos os dados da tabela processo, o nome da empresa importadora(processo.cod_importador - empresa.codemp) e da empresa exportadora(processo.cod_exportador - empresa.codemp), o nome do usuário do processo (processo.processo_usuario - usuario.usuarioid) e a data de confirmação de embarque(colunas nro_pro, ano_pro da tabela processo lincadas com nro_pro, ano_pro da tabela processotracking onde a coluna ordem no processotracking for igual a 1, a coluna processotracking.confirmacaodata é a confirmação do embarque). 
 
 Resposta:
-Comando SQL
 
-
+```sql
 SELECT 
     p.*,
     imp.razaosocial_emp AS nome_importador,
     exp.razaosocial_emp AS nome_exportador,
-    u.nome_usu AS nome_usuario,
-    pt.confirmacaodata AS data_confirmacao_embarque
+    u.nome_usu          AS nome_usuario,
+    pt.confirmacaodata  AS data_confirmacao_embarque
 FROM processo p
 LEFT JOIN empresa imp 
-    ON p.cod_importador = imp.cod_emp
+       ON p.cod_importador = imp.cod_emp
 LEFT JOIN empresa exp 
-    ON p.cod_exportador = exp.cod_emp
+       ON p.cod_exportador = exp.cod_emp
 LEFT JOIN usuario u 
-    ON p.processo_usuario = u.usuarioid
+       ON p.processo_usuario = u.usuarioid
 LEFT JOIN processotracking pt 
-    ON p.nro_pro = pt.nro_pro 
-                              AND p.ano_pro = pt.ano_pro 
-                              AND pt.ordem = 1;
-                              
+       ON p.nro_pro = pt.nro_pro 
+      AND p.ano_pro = pt.ano_pro 
+      AND pt.ordem = 1;
+```
                              
 
 ### Questão 3 - Embarque e Chegada na Ordem Máxima
@@ -82,29 +83,26 @@ LEFT JOIN processotracking pt
 Assim como na questão anterior pegue todos os dados informados, mas adicione também da tabela processotracking a data de confirmação de chegada que seria a ordem máxima, ou seja, seria processotracking.confirmacaodata quando a ordem fosse maxima.
 
 Resposta:
-SQL
 
-
+```sql
 SELECT 
-
     p.*,
     imp.razaosocial_emp AS nome_importador,
     exp.razaosocial_emp AS nome_exportador,
-    u.nome_usu AS nome_usuario,
+    u.nome_usu          AS nome_usuario,
     emb.confirmacaodata AS data_confirmacao_embarque,
     che.confirmacaodata AS data_confirmacao_chegada
 FROM processo p
 LEFT JOIN empresa imp 
-ON p.cod_importador = imp.cod_emp
+       ON p.cod_importador = imp.cod_emp
 LEFT JOIN empresa exp 
-ON p.cod_exportador = exp.cod_emp
+       ON p.cod_exportador = exp.cod_emp
 LEFT JOIN usuario u   
-ON p.processo_usuario = u.usuarioid
+       ON p.processo_usuario = u.usuarioid
 LEFT JOIN processotracking emb
        ON emb.nro_pro = p.nro_pro
       AND emb.ano_pro = p.ano_pro
       AND emb.ordem = 1
-
 LEFT JOIN processotracking che
        ON che.nro_pro = p.nro_pro
       AND che.ano_pro = p.ano_pro
@@ -113,7 +111,8 @@ LEFT JOIN processotracking che
             FROM processotracking t
             WHERE t.nro_pro = p.nro_pro
               AND t.ano_pro = p.ano_pro
-      ); 
+      );
+```
 
 
 ### Questão 4 - Aplicação Backend em C# (.NET 8 + Entity Framework Core)
