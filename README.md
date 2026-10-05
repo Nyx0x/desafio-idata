@@ -206,5 +206,5 @@ npm run dev
 - **Acesso ao Dashboard:** `http://localhost:5173`
 
   <div align="center">
-  <sub>Desenvolvido com muito café ⛾.</sub>
+  <sub>Desenvolvido com muito café ☕.</sub>
 </div>
