@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { 
-  Box, 
-  Tabs, 
-  Tab, 
-  Typography, 
-  Paper, 
-  CircularProgress, 
-  Alert, 
+import {
+  Box,
+  Tabs,
+  Tab,
+  Typography,
+  Paper,
+  CircularProgress,
+  Alert,
   Chip,
   ThemeProvider,
   createTheme,
@@ -31,6 +31,10 @@ const theme = createTheme({
   },
 });
 
+// Formata data/hora no padrão brasileiro (usado nas colunas de data simples)
+const formatarDataHora = (params) =>
+  params.value ? new Date(params.value).toLocaleString('pt-BR') : '—';
+
 export default function App() {
   const [tabAtiva, setTabAtiva] = useState(0);
   const [dadosQ2, setDadosQ2] = useState([]);
@@ -39,18 +43,17 @@ export default function App() {
   const [erro, setErro] = useState(null);
   const gridRef = useRef(null);
 
- const exportarCSV = () => {
+  const exportarCSV = () => {
     const dados = tabAtiva === 0 ? dadosQ2 : dadosQ3;
     if (!dados || dados.length === 0) return;
 
-    // Cabeçalhos das colunas
+    const fmt = (v) => (v ? new Date(v).toLocaleString('pt-BR') : '');
+
     const cabecalhos = [
-      'ID Processo',
-      'Nº Processo',
-      'Ano',
-      'Importador',
-      'Exportador',
-      'Responsável',
+      'ID Processo', 'Nº Processo', 'Ano',
+      'Cód. Importador', 'Importador', 'Cód. Exportador', 'Exportador',
+      'Cód. Usuário', 'Responsável',
+      'Abertura', 'Encerramento', 'Liberação', 'Ident. Cliente',
       'Confirmação Embarque (Ordem 1)'
     ];
 
@@ -58,36 +61,34 @@ export default function App() {
       cabecalhos.push('Confirmação Chegada (Ordem Máx)');
     }
 
-    // Monta as linhas formatadas
-    const linhas = dados.map(item => {
-      const dataEmbarque = item.dataConfirmacaoEmbarque 
-        ? new Date(item.dataConfirmacaoEmbarque).toLocaleString('pt-BR') 
-        : 'Pendente';
-
+    const linhas = dados.map((item) => {
       const linha = [
         item.processoId,
         item.nroPro,
         item.anoPro,
+        item.codImportador ?? '',
         `"${item.nomeImportador || ''}"`,
+        item.codExportador ?? '',
         `"${item.nomeExportador || ''}"`,
+        item.processoUsuario ?? '',
         `"${item.nomeUsuario || ''}"`,
-        `"${dataEmbarque}"`
+        `"${fmt(item.dtAbPro)}"`,
+        `"${fmt(item.dtEncPro)}"`,
+        `"${fmt(item.dtLibPro)}"`,
+        `"${item.identCliPro || ''}"`,
+        `"${item.dataConfirmacaoEmbarque ? fmt(item.dataConfirmacaoEmbarque) : 'Pendente'}"`
       ];
 
       if (tabAtiva === 1) {
-        const dataChegada = item.dataConfirmacaoChegada 
-          ? new Date(item.dataConfirmacaoChegada).toLocaleString('pt-BR') 
-          : 'Pendente';
-        linha.push(`"${dataChegada}"`);
+        linha.push(`"${item.dataConfirmacaoChegada ? fmt(item.dataConfirmacaoChegada) : 'Pendente'}"`);
       }
 
       return linha.join(';');
     });
 
-    // Adiciona o BOM (\uFEFF) para garantir que caracteres acentuados abram perfeitos no Excel
+    // BOM (\uFEFF) para o Excel abrir acentos corretamente
     const conteudoCSV = '\uFEFF' + [cabecalhos.join(';'), ...linhas].join('\n');
-    
-    // Cria o link temporário e dispara o download no navegador
+
     const blob = new Blob([conteudoCSV], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -120,56 +121,46 @@ export default function App() {
       .finally(() => setCarregando(false));
   }, [tabAtiva]);
 
+  // Chip verde (data confirmada) ou laranja "Pendente" (valor nulo)
   const formatadorDataStatus = (params) => {
     if (!params.value) {
       return <Chip label="Pendente" color="warning" size="small" variant="outlined" />;
     }
     return (
-      <Chip 
+      <Chip
         label={new Date(params.value).toLocaleDateString('pt-BR', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
           hour: '2-digit',
           minute: '2-digit'
-        })} 
-        color="success" 
-        size="small" 
+        })}
+        color="success"
+        size="small"
         sx={{ fontWeight: '500' }}
       />
     );
   };
 
-const colunasBase = useMemo(() => [
-    { 
-      field: 'processoId', 
-      headerName: 'ID', 
-      width: 75, 
-      filter: 'agNumberColumnFilter' 
-    },
-    { 
-      field: 'nroPro', 
-      headerName: 'Nº Processo', 
+  const colunasBase = useMemo(() => [
+    { field: 'processoId', headerName: 'ID', width: 75, filter: 'agNumberColumnFilter' },
+    {
+      field: 'nroPro',
+      headerName: 'Nº Processo',
       width: 130,
       cellRenderer: (p) => <strong>{p.value}/{p.data?.anoPro}</strong>
     },
-    { 
-      field: 'nomeImportador', 
-      headerName: 'Empresa Importadora', 
-      flex: 1.2, 
-      minWidth: 170 
-    },
-    { 
-      field: 'nomeExportador', 
-      headerName: 'Empresa Exportadora', 
-      flex: 1.2, 
-      minWidth: 170 
-    },
-    { 
-      field: 'nomeUsuario', 
-      headerName: 'Responsável', 
-      width: 140 
-    },
+    { field: 'anoPro', headerName: 'Ano', width: 90, filter: 'agNumberColumnFilter' },
+    { field: 'codImportador', headerName: 'Cód. Importador', width: 140, filter: 'agNumberColumnFilter' },
+    { field: 'nomeImportador', headerName: 'Empresa Importadora', flex: 1.2, minWidth: 170 },
+    { field: 'codExportador', headerName: 'Cód. Exportador', width: 140, filter: 'agNumberColumnFilter' },
+    { field: 'nomeExportador', headerName: 'Empresa Exportadora', flex: 1.2, minWidth: 170 },
+    { field: 'processoUsuario', headerName: 'Cód. Usuário', width: 130, filter: 'agNumberColumnFilter' },
+    { field: 'nomeUsuario', headerName: 'Responsável', width: 140 },
+    { field: 'dtAbPro', headerName: 'Abertura', minWidth: 170, valueFormatter: formatarDataHora },
+    { field: 'dtEncPro', headerName: 'Encerramento', minWidth: 170, valueFormatter: formatarDataHora },
+    { field: 'dtLibPro', headerName: 'Liberação', minWidth: 170, valueFormatter: formatarDataHora },
+    { field: 'identCliPro', headerName: 'Ident. Cliente', width: 140, valueFormatter: (p) => p.value ?? '—' },
     {
       field: 'dataConfirmacaoEmbarque',
       headerName: 'Confirmação de Embarque (Ordem 1)',
@@ -205,13 +196,13 @@ const colunasBase = useMemo(() => [
           </Typography>
         </Box>
 
-       <Paper 
-          elevation={2} 
-          sx={{ 
-            mb: 3, 
-            borderRadius: 2, 
-            display: 'flex', 
-            alignItems: 'center', 
+        <Paper
+          elevation={2}
+          sx={{
+            mb: 3,
+            borderRadius: 2,
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'space-between',
             pr: 2
           }}
@@ -227,9 +218,9 @@ const colunasBase = useMemo(() => [
             <Tab label="Questão 3 — Embarque & Chegada (Ordem Máxima)" sx={{ fontWeight: 'bold', py: 2 }} />
           </Tabs>
 
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Button
+            variant="contained"
+            color="primary"
             size="small"
             onClick={exportarCSV}
             sx={{ textTransform: 'none', fontWeight: 'bold', px: 2, py: 1 }}
@@ -252,20 +243,20 @@ const colunasBase = useMemo(() => [
           <Paper elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
             <div className="ag-theme-alpine" style={{ height: 480, width: '100%' }}>
               <AgGridReact
-  ref={gridRef}            
-  rowData={tabAtiva === 0 ? dadosQ2 : dadosQ3}
-  columnDefs={tabAtiva === 0 ? colunasQuestao2 : colunasQuestao3}
-  defaultColDef={{
-    sortable: true,
-    filter: true,
-    resizable: true,
-    floatingFilter: true,
-    wrapHeaderText: true,       
-    autoHeaderHeight: true,     
-  }}
-  pagination={true}
-  paginationPageSize={10}
-/>
+                ref={gridRef}
+                rowData={tabAtiva === 0 ? dadosQ2 : dadosQ3}
+                columnDefs={tabAtiva === 0 ? colunasQuestao2 : colunasQuestao3}
+                defaultColDef={{
+                  sortable: true,
+                  filter: true,
+                  resizable: true,
+                  floatingFilter: true,
+                  wrapHeaderText: true,
+                  autoHeaderHeight: true,
+                }}
+                pagination={true}
+                paginationPageSize={10}
+              />
             </div>
           </Paper>
         )}
