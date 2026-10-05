@@ -1,21 +1,21 @@
 # 🚢 Desafio Técnico iData — Monitoramento Logístico de Cargas
 
-Solução completa desenvolvida para o desafio técnico da **iData**, contemplando modelagem relacional, extração de dados com consultas SQL otimizadas, API RESTful construída em **.NET 8 (C#)** e interface analítica em **React** com **Material UI** e **AG Grid**.
+Solução completa desenvolvida para o desafio técnico da **iData**, consumo de um modelo relacional existente, extração de dados com consultas SQL com múltiplos joins e subquery correlacionada, API RESTful construída em **.NET 8 (C#)** e interface analítica em **React** com **Material UI** e **AG Grid**.
 
 ---
 
 ## 🏛️ Visão Geral da Arquitetura
 
 O sistema integra o fluxo completo de dados operacionais de comércio exterior:
-
+```
 [ MySQL 8.0 (Docker) ]
-│  (Relacionamentos com chaves compostas / Subqueries de ordem máxima)
-▼
+        │  chaves compostas / subqueries de ordem máxima
+        ▼
 [ .NET 8 Web API ]
-│  (Entity Framework Core + DTOs desacoplados)
-▼
-[ React + AG Grid Dashboard ]
-(Tabs dinâmicas, badges condicionais e exportação CSV com UTF-8 BOM)
+        │  Entity Framework Core + DTOs
+        ▼
+[ React + AG Grid ]
+```
 
 
 ---
@@ -29,7 +29,7 @@ O sistema integra o fluxo completo de dados operacionais de comércio exterior:
 
 ---
 
-## 📋 Resolução das Questões Teóricas & SQL
+## 📋 Resolução das Questões SQL
 
 ### Questão 1 — Consulta Base
 
@@ -136,7 +136,7 @@ LEFT JOIN processotracking che
 
  - Tabela analítica com AG Grid React:
 
-        Ordenação e filtros flutuantes activos em todas as colunas.
+        Ordenação e ativos em todas as colunas.
 
         Formatação condicional com badges/chips coloridos (success para datas confirmadas e warning com rótulo "Pendente" para valores nulos).
 
@@ -159,7 +159,7 @@ LEFT JOIN processotracking che
 
 ### 1. Iniciar a Base de Dados (MySQL no Docker)
 
-Execute o comando para subir o contêiner do MySQL e, em seguida, importe o ficheiro de dump:
+Execute o comando para subir o contêiner do MySQL e, em seguida, importe o arquivo de dump:
 
 ```bash
 # Iniciar o contêiner MySQL 8.0
@@ -171,19 +171,22 @@ docker run --name mysql-idata \
 
 # Importar o dump fornecido para a base de dados
 docker exec -i mysql-idata mysql -uroot -proot desafioidatadb < dump.sql
+
+> Aguarde cerca de 20–30 segundos para o MySQL terminar de iniciar antes de importar o dump.
 ```
 
 ---
 
 ### 2. Iniciar a API (.NET 8)
 
-Navegue até ao diretório do backend, restaure as dependências e inicie o servidor:
+Navegue até o diretório do backend, restaure as dependências e inicie o servidor:
 
 ```bash
 cd backend
 dotnet restore
 dotnet run
 ```
+A connection string está em backend/appsettings.json (usuário root, senha root, porta 3306, conforme o contêiner acima).
 
 > **Acesso à API:**  
 > A API estará em execução em `http://localhost:5248`.  
@@ -193,7 +196,7 @@ dotnet run
 
 ### 3. Iniciar o Frontend (React + Vite)
 
-Noutro terminal, navegue até ao diretório do frontend, instale os pacotes e suba o servidor de desenvolvimento:
+Em outro terminal, navegue até ao diretório do frontend, instale os pacotes e suba o servidor de desenvolvimento:
 
 ```bash
 cd frontend
@@ -202,4 +205,4 @@ npm run dev
 ```
 
 > **Acesso ao Dashboard:**  
-> Aceda a `http://localhost:5173` no navegador para interagir com a aplicação.
+> Acesse a `http://localhost:5173` no navegador para interagir com a aplicação.
