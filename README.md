@@ -127,6 +127,8 @@ LEFT JOIN processotracking che
 
  - Driver Pomelo MySQL com versão fixada para resiliência na inicialização.
 
+ - Reaproveitamento das Queries validadas nas questões anteriores, garantindo resultado idêntico.
+
 
 ### Questão 5 — Aplicação Frontend em React (MUI + AG Grid)
 
