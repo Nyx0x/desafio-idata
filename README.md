@@ -155,27 +155,51 @@ LEFT JOIN processotracking che
 
     Ambiente Operacional: Pop!_OS Linux
 
-🚀 Como Executar o Projeto Localmente
+## 🚀 Como Executar o Projeto Localmente
 
-1. Iniciar a Base de Dados (MySQL no Docker)
-Bash
+### 1. Iniciar a Base de Dados (MySQL no Docker)
 
-docker run --name mysql-idata -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=desafioidatadb -p 3306:3306 -d mysql:8.0
+Execute o comando para subir o contêiner do MySQL e, em seguida, importe o ficheiro de dump:
+
+```bash
+# Iniciar o contêiner MySQL 8.0
+docker run --name mysql-idata \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=desafioidatadb \
+  -p 3306:3306 \
+  -d mysql:8.0
+
+# Importar o dump fornecido para a base de dados
 docker exec -i mysql-idata mysql -uroot -proot desafioidatadb < dump.sql
+```
 
-2. Iniciar a API (.NET 8)
-Bash
+---
 
+### 2. Iniciar a API (.NET 8)
+
+Navegue até ao diretório do backend, restaure as dependências e inicie o servidor:
+
+```bash
 cd backend
 dotnet restore
 dotnet run
+```
 
-A API ficará acessível em http://localhost:5248 (Documentação Swagger em /swagger).
-3. Iniciar o Frontend (React + Vite)
-Bash
+> **Acesso à API:**  
+> A API estará em execução em `http://localhost:5248`.  
+> A documentação interativa via Swagger pode ser acedida em `http://localhost:5248/swagger`.
 
+---
+
+### 3. Iniciar o Frontend (React + Vite)
+
+Noutro terminal, navegue até ao diretório do frontend, instale os pacotes e suba o servidor de desenvolvimento:
+
+```bash
 cd frontend
 npm install
 npm run dev
+```
 
-Abra http://localhost:5173 no navegador para utilizar a interface.
+> **Acesso ao Dashboard:**  
+> Aceda a `http://localhost:5173` no navegador para interagir com a aplicação.
