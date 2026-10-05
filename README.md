@@ -161,50 +161,50 @@ LEFT JOIN processotracking che
 
 ### 1. Iniciar a Base de Dados (MySQL no Docker)
 
-Execute o comando para subir o contêiner do MySQL e, em seguida, importe o arquivo de dump:
-
+Inicie o contêiner do MySQL 8.0:
 ```bash
-# Iniciar o contêiner MySQL 8.0
 docker run --name mysql-idata \
   -e MYSQL_ROOT_PASSWORD=root \
   -e MYSQL_DATABASE=desafioidatadb \
   -p 3306:3306 \
   -d mysql:8.0
+```
 
-# Importar o dump fornecido para a base de dados
+> **Nota:** Aguarde cerca de 20 a 30 segundos para o MySQL concluir a inicialização interna antes de importar o dump.
+
+Importe o ficheiro de dump fornecido para a base de dados:
+```bash
 docker exec -i mysql-idata mysql -uroot -proot desafioidatadb < dump.sql
-
-> Aguarde cerca de 20–30 segundos para o MySQL terminar de iniciar antes de importar o dump.
 ```
 
 ---
 
 ### 2. Iniciar a API (.NET 8)
 
-Navegue até o diretório do backend, restaure as dependências e inicie o servidor:
-
+Navegue até à pasta do backend, restaure os pacotes e execute o servidor:
 ```bash
 cd backend
 dotnet restore
 dotnet run
 ```
-A connection string está em backend/appsettings.json (usuário root, senha root, porta 3306, conforme o contêiner acima).
+*A cadeia de ligação (`ConnectionStrings`) encontra-se parametrizada em `backend/appsettings.json` (utilizador `root`, palavra-passe `root`, porta `3306`).*
 
-> **Acesso à API:**  
-> A API estará em execução em `http://localhost:5248`.  
-> A documentação interativa via Swagger pode ser acedida em `http://localhost:5248/swagger`.
+- **Acesso à API:** `http://localhost:5248`
+- **Documentação Swagger:** `http://localhost:5248/swagger`
 
 ---
 
 ### 3. Iniciar o Frontend (React + Vite)
 
-Em outro terminal, navegue até ao diretório do frontend, instale os pacotes e suba o servidor de desenvolvimento:
-
+Num novo terminal, aceda ao diretório do frontend, instale as dependências e inicie o ambiente de desenvolvimento:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-> **Acesso ao Dashboard:**  
-> Acesse a `http://localhost:5173` no navegador para interagir com a aplicação.
+- **Acesso ao Dashboard:** `http://localhost:5173`
+
+  <div align="center">
+  <sub>Desenvolvido com muito café ⛾.</sub>
+</div>
