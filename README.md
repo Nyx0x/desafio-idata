@@ -34,7 +34,7 @@ O sistema integra o fluxo completo de dados operacionais de comércio exterior:
 ### Questão 1 — Consulta Base
 
 Qual seria o comando para trazer o seguinte resultado?
-![Foto](/home/nyx/Downloads/Screenshot 2026-10-05 at 01-09-44.png)
+<img width="602" height="199" alt="Screenshot 2026-10-05 at 01-09-44 " src="https://github.com/user-attachments/assets/413ea2fd-45e2-4c71-984c-e97bfc84bea5" />
 
 Resposta:
 Com base nas tabelas `DISCIPLINA` e `DOCENTE`, o comando para obter a projeção unificada com o nome do professor por disciplina é:
